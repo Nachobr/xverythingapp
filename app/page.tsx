@@ -1,101 +1,156 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import Button from "@/components/ui/button";
+import Link from "next/link";
 import Image from "next/image";
+import { Wallet2 } from "lucide-react";
+import { ConditionalLayout } from "@/components/ConditionalLayout";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const { user, isAdmin, loginWithGoogle, connectWallet, logout, loading } = useAuth();
+  const router = useRouter();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const handleGoogleLogin = async () => {
+    const email = "ignbritos@gmail.com"; // Replace with actual email from Google login
+    await loginWithGoogle(email);
+    router.push("/home"); // Redirect to home page after login
+  };
+
+  const handleWalletConnect = async () => {
+    const walletAddress = "0x245Bd6B5D8f494df8256Ae44737A1e5D59769aB4"; // Replace with actual wallet address
+    await connectWallet(walletAddress);
+    router.push("/home"); // Redirect to home page after login
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <ConditionalLayout>
+      <div className="flex-grow flex justify-center items-center p-16">
+        <div className="w-full flex flex-row justify-center items-center max-w-full space-y-8 space-x-4">
+          <div className="flex flex-col lg:w-96 lg:h-96">
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              className="w-10 h-10 text-white md:w-12 md:h-12 lg:w-auto lg:h-auto"
+            >
+              <g>
+                <path
+                  fill="currentColor"
+                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+                ></path>
+              </g>
+            </svg>
+          </div>
+          <div className="flex flex-col max-w-screen">
+            <div className="space-y-6">
+              <h1 className="text-6xl font-bold">Happening now</h1>
+              <h2 className="text-3xl font-bold">Join today </h2>
+            </div>
+
+            <div className="space-y-2">
+              {/* Sign up with Google */}
+              <div className="w-72 mw-72 grid justify-center items-center bg-white hover:bg-gray-200 rounded-full">
+                <Button
+                  variant="outline"
+                  className="flex justify-center items-center gap-x-4 w-52 h-10 text-base font-medium bg-white text-black hover:bg-gray-200"
+                  onClick={handleGoogleLogin}
+                >
+                  <Image
+                    src="/google.svg?height=20&width=20"
+                    alt="Google"
+                    width={20}
+                    height={20}
+                  />
+                  Sign up with Google
+                </Button>
+              </div>
+
+              {/* Connect Wallet */}
+              <div className="w-72 mw-72 grid justify-center items-center bg-white hover:bg-gray-200 rounded-full">
+                <Button
+                  variant="outline"
+                  className="flex justify-center items-center gap-x-4 w-52 h-10 text-base font-medium bg-white text-black hover:bg-gray-200"
+                  onClick={handleWalletConnect}
+                >
+                  <Wallet2 className="h-5 w-5" />
+                  Connect Wallet
+                </Button>
+              </div>
+
+              {/* Divider */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center w-72 mw-72">
+                  <span className="w-full border-t border-gray-800" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase w-72 mw-72">
+                  <span className="bg-black px-2 text-white">or</span>
+                </div>
+              </div>
+
+              {/* Create Account */}
+              <Button className="w-72 mw-72 h-10 text-base font-medium bg-[#1D9BF0] text-white hover:bg-gray-200 rounded-full">
+                Create account
+              </Button>
+
+              {/* Terms and Conditions */}
+              <div className="text-xs text-gray-500 w-72 mw-72">
+                By signing up, you agree to the{" "}
+                <Link href="#" className="text-[#1d9bf0] hover:underline">
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link href="#" className="text-[#1d9bf0] hover:underline">
+                  Privacy Policy
+                </Link>
+                , including{" "}
+                <Link href="#" className="text-[#1d9bf0] hover:underline">
+                  Cookie Use
+                </Link>
+                .
+              </div>
+            </div>
+
+            {/* Already have an account? */}
+            <div className="space-y-4 w-72 mw-72">
+              <h3 className="font-bold">Already have an account?</h3>
+              {user ? (
+                <>
+                  <p>Welcome, {user.email || user.walletAddress}!</p>
+                  {isAdmin && (
+                    <Button
+                      variant="outline"
+                      className="w-full h-10 text-base font-medium border-gray-800 hover:bg-[#181818] text-[#1d9bf0]"
+                      onClick={() => router.push("/admin")}
+                    >
+                      Go to Admin Dashboard
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    className="w-full h-10 text-base font-medium border-[#536471] border-2 hover:bg-[#181818] text-[#1d9bf0] rounded-full border-solid"
+                    onClick={logout}
+                  >
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="w-full h-10 text-base font-medium border-[#536471] border-2 hover:bg-[#181818] text-[#1d9bf0] rounded-full border-solid"
+                  onClick={handleGoogleLogin}
+                >
+                  Sign in
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+    </ConditionalLayout>
   );
 }
