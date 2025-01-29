@@ -13,7 +13,6 @@ export function MoreOptionsModal({ isOpen, onClose }: MoreOptionsModalProps) {
   const options = [
     { icon: Star, label: "Premium", href: "/premium" },
     { icon: Bookmark, label: "Bookmarks", href: "/bookmarks" },
-    { icon: Briefcase, label: "Jobs", href: "/jobs" },
     { icon: BarChart3, label: "Ads", href: "/ads" },
     { icon: Hash, label: "Spaces", href: "/spaces" },
     { icon: Settings, label: "Settings and Privacy", href: "/settings" },
@@ -27,8 +26,8 @@ export function MoreOptionsModal({ isOpen, onClose }: MoreOptionsModalProps) {
           className="w-full max-w-[300px] transform overflow-y-auto rounded-lg bg-black text-white border border-gray-800 shadow-[0_0_15px_rgba(255,255,255,0.2),0_0_3px_1px_rgba(255,255,255,0.15)] transition-all"
           style={{
             position: "fixed",
-            top: "20%",
-            left: "18.5%",
+            top: "30%",
+            left: "21.5%",
             maxHeight: "90vh",
           }}
         >

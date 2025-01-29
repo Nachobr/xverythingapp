@@ -14,11 +14,11 @@ export function PostModal({ isOpen, onClose }: PostModalProps) {
         <DialogPanel
 
           transition
-          className="w-full max-w-[225px] transform overflow-y-auto rounded-lg bg-black text-white border border-gray-800 shadow-[0_0_15px_rgba(255,255,255,0.2),0_0_3px_1px_rgba(255,255,255,0.15)] transition-all"
+          className="w-full max-w-[235px] transform overflow-y-auto rounded-lg bg-black text-white border border-gray-800 shadow-[0_0_15px_rgba(255,255,255,0.2),0_0_3px_1px_rgba(255,255,255,0.15)] transition-all"
           style={{
             position: "fixed",
-            top: "45%",
-            left: "20.5%",
+            top: "50.3%",
+            left: "20.9%",
             maxHeight: "90vh",
           }}
         >
