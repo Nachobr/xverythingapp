@@ -15,7 +15,7 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (mounted && !loading && !isLoggedIn) {
+    if (mounted && !loading && !isLoggedIn && !window.location.pathname.includes('/checkout')) {
       router.push("/");
     }
   }, [isLoggedIn, loading, mounted]);
@@ -24,7 +24,7 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
     return <div>Loading...</div>;
   }
 
-  return isLoggedIn ? (
+  return isLoggedIn || window.location.pathname.includes('/checkout') ? (
     <div className="min-h-screen bg-black text-white">
       <Navbar />
       <div className="flex-grow">{children}</div>
