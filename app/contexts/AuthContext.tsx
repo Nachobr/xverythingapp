@@ -1,6 +1,6 @@
 "use client"; // Add this line since context uses React hooks
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const ADMIN_WHITELIST = {
@@ -24,6 +24,7 @@ interface AuthContextType {
   isLoggedIn: boolean;
   loading: boolean;
   loginWithGoogle: (email: string) => Promise<void>;
+  loginWithApple: (email: string) => Promise<void>;
   connectWallet: (walletAddress: string) => Promise<void>;
   logout: () => void;
 }
@@ -34,37 +35,107 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(false);
-  const isLoggedIn = !!user; // true if user exists, false otherwise
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
+
+  const loginWithApple = async (email: string) => {
+    setLoading(true);
+    try {
+      const userData = { id: "1", email, isAdmin: ADMIN_WHITELIST.googleEmails.includes(email) };
+      setUser(userData);
+      setIsAdmin(userData.isAdmin);
+      setIsLoggedIn(true);
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('isLoggedIn', 'true');
+    } catch (error) {
+      console.error("Apple login failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    const loggedInStatus = localStorage.getItem('isLoggedIn');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+    if (loggedInStatus === 'true') { // Explicitly check for 'true' string
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false); // Ensure isLoggedIn is explicitly set to false if not 'true' in localStorage
+    }
+  }, []);
 
   const loginWithGoogle = async (email: string) => {
     setLoading(true);
+    //console.log("loginWithGoogle started, email:", email); // ADDED LOG
     try {
-      setUser({ id: "1", email });
-      setIsAdmin(ADMIN_WHITELIST.googleEmails.includes(email));
+      const userData = { id: "1", email, isAdmin: ADMIN_WHITELIST.googleEmails.includes(email) };
+      setUser(userData);
+      setIsAdmin(userData.isAdmin);
+      setIsLoggedIn(true);
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('isLoggedIn', 'true');
+      //console.log("loginWithGoogle success, isLoggedIn:", true, "user:", userData); // ADDED LOG
     } catch (error) {
       console.error("Google login failed:", error);
+      //console.log("loginWithGoogle failed, isLoggedIn:", false); // ADDED LOG
     } finally {
       setLoading(false);
+      //console.log("loginWithGoogle finally, loading:", false); // ADDED LOG
     }
   };
 
   const connectWallet = async (walletAddress: string) => {
-    setLoading(true);
     try {
-      setUser({ id: "1", walletAddress });
-      setIsAdmin(ADMIN_WHITELIST.walletAddresses.includes(walletAddress));
+      if (walletAddress) {
+        const userData = {
+          id: "1",
+          walletAddress: walletAddress.toLowerCase(),
+          isAdmin: ADMIN_WHITELIST.walletAddresses.some(
+            address => address.toLowerCase() === walletAddress.toLowerCase()
+          )
+        };
+        
+        setUser(userData);
+        setIsAdmin(userData.isAdmin);
+        setIsLoggedIn(true);
+        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('isLoggedIn', 'true');
+        //console.log("connectWallet success, isLoggedIn:", true, "user:", userData);
+      }
     } catch (error) {
       console.error("Wallet connection failed:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    // Skip the redirect if we're in the process of logging out
+    if (isLoggedIn && !localStorage.getItem('loggingOut')) {
+      router.push('/home');
+    }
+  }, [isLoggedIn, router]);
+
   const logout = () => {
-    setUser(null);
-    setIsAdmin(false);
-    router.push("/");
+    try {
+      // Set logging out flag
+      localStorage.setItem('loggingOut', 'true');
+      
+      // Clear state
+      setUser(null);
+      setIsAdmin(false);
+      setIsLoggedIn(false);
+      localStorage.removeItem('user');
+      localStorage.removeItem('isLoggedIn');
+      
+      // Clear the logging out flag and redirect
+      localStorage.removeItem('loggingOut');
+      router.push('/');
+    } catch (error) {
+      console.error("Logout error:", error);
+      localStorage.removeItem('loggingOut');
+    }
   };
 
   return (
@@ -75,6 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoggedIn,
         loading,
         loginWithGoogle,
+        loginWithApple,
         connectWallet,
         logout,
       }}

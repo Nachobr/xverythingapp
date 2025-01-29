@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import { Dialog, DialogPanel } from "@headlessui/react";
 import { Star, Bookmark, Briefcase, BarChart3, Hash, Settings } from "lucide-react";
 import Button from "../ui/button";
 
@@ -24,17 +24,15 @@ export function MoreOptionsModal({ isOpen, onClose }: MoreOptionsModalProps) {
       <div className="fixed inset-0 flex items-start justify-center p-4">
         <DialogPanel
           transition
-          className="w-full max-w-[384px] transform overflow-y-auto rounded-lg bg-black text-white border border-gray-800 shadow-[0_0_15px_rgba(255,255,255,0.2),0_0_3px_1px_rgba(255,255,255,0.15)] transition-all"
+          className="w-full max-w-[300px] transform overflow-y-auto rounded-lg bg-black text-white border border-gray-800 shadow-[0_0_15px_rgba(255,255,255,0.2),0_0_3px_1px_rgba(255,255,255,0.15)] transition-all"
           style={{
             position: "fixed",
-            top: "5%",
-            left: "20%",
+            top: "20%",
+            left: "18.5%",
             maxHeight: "90vh",
           }}
         >
-          <DialogTitle className="text-xl font-bold p-4 border-b border-gray-800">
-            More Options
-          </DialogTitle>
+
           <div className="flex flex-col">
             {options.map((option, index) => (
               <Button

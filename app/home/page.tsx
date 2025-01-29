@@ -5,10 +5,20 @@ import { Navbar } from "../components/NavBar";
 import { SearchBar } from "../components/ui/SearchBar";
 import { PostField } from "../components/ui/PostField";
 import { Feed } from "../components/ui/Feed";
+import { useAccount } from 'wagmi'
+import { useEffect } from 'react'
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<"forYou" | "following">("forYou");
-
+  const { address, isConnected } = useAccount();
+  const { user, isLoggedIn } = useAuth();
+/*
+  useEffect(() => {
+    //console.log('User:', user);
+    //console.log('Is Logged In:', isLoggedIn);
+  }, [user, isLoggedIn]);
+*/
   return (
     <div className="grid grid-cols-3 grid-rows-1 gap-1">
       {/* Left Navbar */}

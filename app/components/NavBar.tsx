@@ -20,6 +20,9 @@ import { MoreOptionsModal } from "./buttons/MoreOptions";
 import { useAuth } from "@/contexts/AuthContext";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useEffect } from 'react'
+// Add useDisconnect to imports
+import { useDisconnect } from 'wagmi';
 
 interface NavbarProps {
   className?: string;
@@ -30,15 +33,29 @@ export function Navbar({ className }: NavbarProps) {
   const [isMoreOptionsOpen, setIsMoreOptionsOpen] = useState(false);
   const router = useRouter();
   const { user, isLoggedIn, logout } = useAuth();
+  const { disconnect } = useDisconnect();
 
-  const handleLogout = () => {
-    logout();
-    router.push("/");
+  const handleLogout = async () => {
+    try {
+      // Disconnect wallet first
+      await disconnect();
+      // Then logout from auth context
+      logout();
+      // Finally redirect
+      router.push("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
-
+/*
+  useEffect(() => {
+    //console.log('User:', user);
+    //console.log('Is Logged In:', isLoggedIn);
+  }, [user, isLoggedIn]);
+*/
   return (
     <nav className="fixed h-screen p-4 flex flex-col justify-between">
-      <div className="flex flex-col space-y-1 overflow-y-auto" style={{ border: "dotted 1px red" }}>
+      <div className="flex flex-col space-y-1 overflow-y-auto" >
         <Link
           href="/"
           className="p-3 rounded-full hover:bg-gray-900 transition-colors inline-flex items-center text-xl text-white"
@@ -143,7 +160,9 @@ export function Navbar({ className }: NavbarProps) {
             />
             <div>
               <div className="font-semibold text-white">
-                {user.email || user.walletAddress}
+                {user.email || (user.walletAddress ? 
+                  `${user.walletAddress.slice(0, 6)}...${user.walletAddress.slice(-4)}` : 
+                  'Unknown')}
               </div>
               <button
                 onClick={handleLogout}

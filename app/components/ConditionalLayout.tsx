@@ -1,26 +1,33 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useAuth } from "../contexts/AuthContext";
 import { Navbar } from "./NavBar";
+import { useEffect, useState } from "react";
 
 export function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const { isLoggedIn, loading } = useAuth();
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
 
-  // Show a loading state while authentication is being checked
-  if (loading) {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !loading && !isLoggedIn) {
+      router.push("/");
+    }
+  }, [isLoggedIn, loading, mounted]);
+
+  if (!mounted || loading) {
     return <div>Loading...</div>;
   }
 
-  // If the user is not logged in, render the children without the Navbar
-  if (!isLoggedIn) {
-    return <>{children}</>;
-  }
-
-  // If the user is logged in, render the Navbar and the children
-  return (
-    <div className="flex min-h-screen">
+  return isLoggedIn ? (
+    <div className="min-h-screen bg-black text-white">
       <Navbar />
       <div className="flex-grow">{children}</div>
     </div>
-  );
+  ) : null;
 }
