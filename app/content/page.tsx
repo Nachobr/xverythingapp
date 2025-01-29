@@ -223,11 +223,6 @@ export default function ContentPage() {
   };
 
   const getItemsPerView = () => {
-    // Using Tailwind's default breakpoints
-    // 2xl: 1536px and up - 4 items
-    // lg: 1024px to 1535px - 3 items
-    // md: 768px to 1023px - 2 items
-    // Below md - 2 items
     if (typeof window !== 'undefined') {
       if (window.innerWidth >= 1536) return 4; // 2xl
       if (window.innerWidth >= 1024) return 3; // lg
@@ -262,98 +257,105 @@ export default function ContentPage() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-black text-white scrollbar-hide">
-      {/* Left Navbar - Icons only */}
-      <div className="fixed left-0 top-0 w-16 md:w-20 h-screen z-50 bg-black scrollbar-hide">
-        <Navbar className="w-16 md:w-20 scrollbar-hide" />
+    <div className="min-h-screen relative">
+      {/* Mobile Bottom Navbar - Only visible on mobile */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-black border-t border-gray-800 z-50">
+        <Navbar className="w-full h-16 !static !flex-row !justify-around !p-0" />
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 ml-16 md:ml-20 p-4 md:p-8">
-        {selectedContent ? (
-          <div className="fixed inset-0 bg-black z-40 ml-16 md:ml-20 p-4 md:p-8">
-            <button
-              onClick={() => setSelectedContent(null)}
-              className="mb-4 text-gray-400 hover:text-white"
-            >
-              ← Back
-            </button>
-            <div className="relative w-full h-[calc(100vh-200px)] max-w-7xl mx-auto">
-              <div className="absolute inset-0">
-                <video
-                  className="w-full h-full object-contain bg-gray-900 rounded-lg"
-                  controls
-                  autoPlay
-                  src={selectedContent.videoUrl}
-                />
-              </div>
-            </div>
-            <div className="max-w-7xl mx-auto mt-6">
-              <h1 className="text-xl md:text-2xl font-bold mb-2">{selectedContent.title}</h1>
-              <p className="text-sm md:text-base text-gray-400">{selectedContent.description}</p>
-            </div>
-          </div>
-        ) : (
-          <div className="w-full">
-            <h1 className="text-2xl md:text-4xl font-bold mb-4 md:mb-8">Watch Now</h1>
-            
-            {categories.map((category) => (
-              <div key={category} className="mb-6 md:mb-8 relative group overflow-visible">
-                <h2 className="text-xl md:text-2xl font-semibold mb-3 md:mb-4">{category}</h2>
-                <div className="relative">
-                  <div className="flex overflow-hidden relative">
-                    <div 
-                      className="flex transition-transform duration-300 ease-out space-x-4 md:space-x-6"
-                      style={{
-                        transform: `translateX(-${(slidePositions[category] || 0) * (100)}%)`
-                      }}
-                    >
-                      {getContentByCategory(category).map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex-none w-[calc(50%-0.5rem)] md:w-[calc(33.33%-0.75rem)] lg:w-[calc(25%-0.75rem)] min-w-[200px] max-w-[300px] transform transition-transform duration-200 hover:scale-105 cursor-pointer px-2"
-                          onClick={() => handleVideoSelect(item)}
-                        >
-                          <div className="aspect-video relative overflow-hidden rounded-lg">
-                            <img
-                              src={item.thumbnail}
-                              alt={item.title}
-                              className="w-full h-full object-cover transform hover-group-hover:scale-105 transition-transform duration-200"
-                            />
-                            <div className="absolute inset-0 bg-black bg-opacity-0 hover-group-hover:bg-opacity-60 transition-opacity flex items-center justify-center">
-                              <Play className="w-6 h-6 md:w-8 md:h-8 opacity-0 hover-group-hover:opacity-100 transition-opacity" />
-                            </div>
-                          </div>
-                          <div className="mt-2">
-                            <h3 className="font-semibold text-sm md:text-base lg:text-lg">{item.title}</h3>
-                            <p className="text-xs md:text-sm text-gray-400">{item.description}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <button
-                    className="absolute left-0 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
-                    onClick={() => handleSlide('left', category)}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  <button
-                    className="absolute right-0 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full transform translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
-                    onClick={() => handleSlide('right', category)}
-                    style={{ right: '-20px' }}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
+      <div className="grid grid-cols-1 md:grid-cols-[auto,1fr] gap-1 pb-16 md:pb-0">
+        {/* Left Navbar - Hidden on mobile */}
+        <div className="hidden md:flex justify-end sticky top-0 h-screen">
+          <Navbar />
+        </div>
+
+        {/* Main Content */}
+        <div className="w-full">
+          {selectedContent ? (
+            <div className="fixed inset-0 bg-black z-40 p-4 md:p-8">
+              <button
+                onClick={() => setSelectedContent(null)}
+                className="mb-4 text-gray-400 hover:text-white"
+              >
+                ← Back
+              </button>
+              <div className="relative w-full h-[calc(100vh-200px)] max-w-7xl mx-auto">
+                <div className="absolute inset-0">
+                  <video
+                    className="w-full h-full object-contain bg-gray-900 rounded-lg"
+                    controls
+                    autoPlay
+                    src={selectedContent.videoUrl}
+                  />
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+              <div className="max-w-7xl mx-auto mt-6">
+                <h1 className="text-xl md:text-2xl font-bold mb-2">{selectedContent.title}</h1>
+                <p className="text-sm md:text-base text-gray-400">{selectedContent.description}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full p-4 md:p-8">
+              <h1 className="text-2xl md:text-4xl font-bold mb-4 md:mb-8">Watch Now</h1>
+              
+              {categories.map((category) => (
+                <div key={category} className="mb-6 md:mb-8 relative group overflow-visible">
+                  <h2 className="text-xl md:text-2xl font-semibold mb-3 md:mb-4">{category}</h2>
+                  <div className="relative">
+                    <div className="flex overflow-hidden relative">
+                      <div 
+                        className="flex transition-transform duration-300 ease-out space-x-4 md:space-x-6"
+                        style={{
+                          transform: `translateX(-${(slidePositions[category] || 0) * (100)}%)`
+                        }}
+                      >
+                        {getContentByCategory(category).map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex-none w-[calc(50%-0.5rem)] md:w-[calc(33.33%-0.75rem)] lg:w-[calc(25%-0.75rem)] min-w-[200px] max-w-[300px] transform transition-transform duration-200 hover:scale-105 cursor-pointer"
+                            onClick={() => handleVideoSelect(item)}
+                          >
+                            <div className="aspect-video relative overflow-hidden rounded-lg">
+                              <img
+                                src={item.thumbnail}
+                                alt={item.title}
+                                className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-200"
+                              />
+                              <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-60 transition-opacity flex items-center justify-center">
+                                <Play className="w-8 h-8 md:w-12 md:h-12 opacity-0 hover:opacity-100 transition-opacity" />
+                              </div>
+                            </div>
+                            <div className="mt-2">
+                              <h3 className="font-semibold text-base md:text-lg">{item.title}</h3>
+                              <p className="text-xs md:text-sm text-gray-400">{item.description}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <button
+                      className="absolute left-0 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                      onClick={() => handleSlide('left', category)}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                    <button
+                      className="absolute right-0 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full transform translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                      onClick={() => handleSlide('right', category)}
+                      style={{ right: '-20px' }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
